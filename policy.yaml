@@ -1,0 +1,21 @@
+# acs-guardian/policy.yaml
+
+version: "0.1"
+description: "Runtime policy for ACS Guardian - defines what AI agents are allowed to do."
+
+rules:
+  - name: "deny_destructive_actions"
+    action: "DENY"
+    tools:
+      - "delete_database"
+      - "drop_table"
+      - "send_money"
+      - "access_hr_files"
+      - "modify_production_code"
+
+  - name: "allow_safe_actions"
+    action: "ALLOW"
+    tools:
+      - "read_email"
+      - "summarize_document"
+      - "search_web"
