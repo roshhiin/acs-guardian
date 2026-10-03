@@ -39,3 +39,4 @@ if __name__ == "__main__":
     
     # Simulate an unknown action
     evaluate_action("hack_nasa", policy)
+        Updated guardian.py to load rules from policy.yaml
