@@ -19,3 +19,4 @@ rules:
       - "read_email"
       - "summarize_document"
       - "search_web"
+      Added policy.yaml - external policy rules
