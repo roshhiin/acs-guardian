@@ -1,28 +1,41 @@
-# acs-guardian/guardian.py
+import yaml
 
-# 1. Define the Policy (The Rules)
-DENIED_ACTIONS = [
-    "delete_database",
-    "send_money",
-    "access_hr_files",
-    "modify_production_code"
-]
+# 1. Load the Policy from YAML
+def load_policy(file_path="policy.yaml"):
+    with open(file_path, "r") as file:
+        return yaml.safe_load(file)
 
 # 2. The Guardian Function (The Kill Switch)
-def evaluate_action(agent_action):
+def evaluate_action(agent_action, policy):
     print(f"[AUDITOR] Agent is requesting: {agent_action}")
     
-    if agent_action in DENIED_ACTIONS:
-        print("[DENY] Action blocked. This violates the declared scope.")
-        return "DENY"
-    else:
-        print("[ALLOW] Action permitted.")
-        return "ALLOW"
+    # Check DENY rules first
+    for rule in policy.get("rules", []):
+        if rule.get("action") == "DENY":
+            if agent_action in rule.get("tools", []):
+                print("[DENY] Action blocked. This violates the declared scope.")
+                return "DENY"
+    
+    # Check ALLOW rules
+    for rule in policy.get("rules", []):
+        if rule.get("action") == "ALLOW":
+            if agent_action in rule.get("tools", []):
+                print("[ALLOW] Action permitted.")
+                return "ALLOW"
+    
+    # Default: DENY (fail-closed)
+    print("[DENY] Action not in policy. Defaulting to DENY.")
+    return "DENY"
 
 # 3. Test the Guardian
 if __name__ == "__main__":
+    policy = load_policy()
+    
     # Simulate a normal agent action
-    evaluate_action("read_email")
+    evaluate_action("read_email", policy)
     
     # Simulate a rogue agent action
-    evaluate_action("delete_database")
+    evaluate_action("delete_database", policy)
+    
+    # Simulate an unknown action
+    evaluate_action("hack_nasa", policy)
